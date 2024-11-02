@@ -15,13 +15,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CsvParser = void 0;
 const common_1 = require("@nestjs/common");
 const fs = require("fs");
-const path = require("path");
 const config_1 = require("@nestjs/config");
 const csv = require('csv-parser');
 let CsvParser = class CsvParser {
     constructor(configService) {
         this.configService = configService;
-        this.filePath = this.configService.get('CSV_FILE_PATH') || path.join(__dirname, '../../FoodNutritionData.csv');
+        this.filePath = this.configService.get('CSV_FILE_PATH');
         if (!this.filePath) {
             throw new Error('CSV file path is not configured.');
         }
@@ -72,7 +71,7 @@ let CsvParser = class CsvParser {
             protein: this.parseNumber(data['단백질(g)'] || data['protein']),
             fat: this.parseNumber(data['지방(g)'] || data['fat']),
             carbs: this.parseNumber(data['탄수화물(g)'] || data['carbs']),
-            fiber: this.parseNumber(data['총 식이섬유(g)'] || data['fiber']),
+            fiber: this.parseNumber(data['식이섬유(g)'] || data['fiber']),
         };
     }
     parseNumber(value) {

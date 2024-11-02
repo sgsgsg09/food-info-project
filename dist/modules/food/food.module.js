@@ -9,7 +9,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FoodModule = void 0;
 const common_1 = require("@nestjs/common");
 const food_service_1 = require("./food.service");
-const food_controller_1 = require("../../controllers/food.controller");
 const csv_parser_1 = require("../../utils/csv-parser");
 const food_repository_1 = require("./food.repository");
 let FoodModule = class FoodModule {
@@ -17,7 +16,6 @@ let FoodModule = class FoodModule {
 exports.FoodModule = FoodModule;
 exports.FoodModule = FoodModule = __decorate([
     (0, common_1.Module)({
-        controllers: [food_controller_1.FoodController],
         providers: [food_service_1.FoodService, csv_parser_1.CsvParser, food_repository_1.FoodRepository],
         exports: [food_service_1.FoodService],
     })

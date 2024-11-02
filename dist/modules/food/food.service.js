@@ -20,7 +20,9 @@ let FoodService = class FoodService {
         return await this.foodRepository.findAll();
     }
     async getFoodInfo(name) {
-        return await this.foodRepository.findByName(name);
+        const foodInfo = await this.foodRepository.findByName(name);
+        console.log(`FoodService found food info: ${JSON.stringify(foodInfo)}`);
+        return foodInfo;
     }
 };
 exports.FoodService = FoodService;

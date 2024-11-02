@@ -1,31 +1,27 @@
-import { Injectable, Inject } from '@nestjs/common';
+// src/utils/csv-parser.ts
+
 import * as fs from 'fs';
 import * as path from 'path';
+import * as csv from 'csv-parser';
 import { FoodDto } from '../dto/food.dto';
-import { ConfigService } from '@nestjs/config';
 
-const csv = require('csv-parser'); // CommonJS 방식으로 csv-parser 불러오기
-
-@Injectable()
 export class CsvParser {
   private readonly filePath: string;
 
-  constructor(@Inject(ConfigService) private configService: ConfigService) {
-    this.filePath = this.configService.get<string>('CSV_FILE_PATH') || path.join(__dirname, '../../FoodNutritionData.csv');
-    
-    // 파일 경로가 설정되지 않은 경우 예외 발생
-    if (!this.filePath) {
-      throw new Error('CSV file path is not configured.');
+  constructor(filePath?: string) {
+    // 기본 CSV 파일 경로 설정
+    this.filePath = filePath || path.join(__dirname, '../../FoodNutritionData.csv');
+
+    // 파일이 존재하지 않으면 에러 발생
+    if (!fs.existsSync(this.filePath)) {
+      throw new Error(`CSV file not found at path: ${this.filePath}`);
     }
   }
 
-  // CSV 파일을 파싱하여 주요 필드만 반환하는 메서드
+  // CSV 파일을 파싱하여 모든 음식 데이터를 반환
   async parseFoodData(): Promise<FoodDto[]> {
-    if (!fs.existsSync(this.filePath)) {
-      throw new Error(`File not found at path: ${this.filePath}`);
-    }
-
     const results: FoodDto[] = [];
+
     return new Promise((resolve, reject) => {
       fs.createReadStream(this.filePath)
         .pipe(csv())
@@ -33,7 +29,7 @@ export class CsvParser {
           try {
             results.push(this.mapToFoodDto(data));
           } catch (error) {
-            reject(new Error(`Error parsing data row: ${error.message}`));
+            reject(new Error(`Error parsing row: ${error.message}`));
           }
         })
         .on('end', () => resolve(results))
@@ -41,32 +37,26 @@ export class CsvParser {
     });
   }
 
-  // 특정 음식 이름이 포함된 데이터를 검색하는 메서드
+  // 특정 음식 이름을 검색하여 해당 데이터를 반환
   async searchFoodByName(name: string): Promise<FoodDto[]> {
-    const lowerCasedName = name.trim().toLowerCase();
     const results: FoodDto[] = [];
-
-    if (!fs.existsSync(this.filePath)) {
-      throw new Error(`File not found at path: ${this.filePath}`);
-    }
+    const searchName = name.trim().toLowerCase();
 
     return new Promise((resolve, reject) => {
       fs.createReadStream(this.filePath)
         .pipe(csv())
         .on('data', (data) => {
           const foodData = this.mapToFoodDto(data);
-          
-          // 부분 일치 검색을 위해 includes 사용
-          if (foodData.name.toLowerCase().includes(lowerCasedName)) {
+          if (foodData.name.toLowerCase().includes(searchName)) {
             results.push(foodData);
           }
         })
-        .on('end', () => resolve(results)) // 모든 일치 항목을 배열로 반환
-        .on('error', (error) => reject(new Error(`Error searching for food: ${error.message}`)));
+        .on('end', () => resolve(results))
+        .on('error', (error) => reject(new Error(`Error searching CSV: ${error.message}`)));
     });
   }
 
-  // CSV 데이터를 FoodDto 형식에 맞게 매핑하는 함수
+  // CSV 데이터를 FoodDto 형식으로 매핑
   private mapToFoodDto(data: any): FoodDto {
     return {
       name: data['식품명'] || data['name'],
@@ -74,11 +64,11 @@ export class CsvParser {
       protein: this.parseNumber(data['단백질(g)'] || data['protein']),
       fat: this.parseNumber(data['지방(g)'] || data['fat']),
       carbs: this.parseNumber(data['탄수화물(g)'] || data['carbs']),
-      fiber: this.parseNumber(data['총 식이섬유(g)'] || data['fiber']),
+      fiber: this.parseNumber(data['식이섬유(g)'] || data['fiber']),
     };
   }
 
-  // 숫자 값을 파싱하는 함수, NaN일 경우 0 반환
+  // NaN 값을 0으로 처리하는 숫자 파싱 함수
   private parseNumber(value: string | undefined): number {
     const parsed = parseFloat(value || '0');
     return isNaN(parsed) ? 0 : parsed;

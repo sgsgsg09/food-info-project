@@ -10,7 +10,10 @@ export class FoodService {
     return await this.foodRepository.findAll();
   }
 
-  async getFoodInfo(name: string): Promise<FoodDto[]> {
-    return await this.foodRepository.findByName(name);
-  }
+// FoodService
+async getFoodInfo(name: string): Promise<FoodDto[]> {
+  const foodInfo = await this.foodRepository.findByName(name);
+  console.log(`FoodService found food info: ${JSON.stringify(foodInfo)}`);
+  return foodInfo;
+}
 }

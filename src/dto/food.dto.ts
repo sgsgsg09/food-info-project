@@ -4,7 +4,7 @@ export class FoodDto {
   @ApiProperty({ description: '식품명' })
   name: string;
 
-  @ApiProperty({ description: '에너지(kcal)', example: 200 })
+  @ApiProperty({ description: '에너지(kcal)', example: 100 })
   calories: number;
 
   @ApiProperty({ description: '단백질(g)', example: 6 })
