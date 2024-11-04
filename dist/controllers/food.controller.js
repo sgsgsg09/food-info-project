@@ -38,7 +38,6 @@ __decorate([
     (0, common_1.Get)('info'),
     (0, swagger_1.ApiOperation)({ summary: '음식 이름으로 음식 정보 조회' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: '음식 정보 반환', type: food_dto_1.FoodDto, isArray: true }),
-    (0, swagger_1.ApiResponse)({ status: 404, description: '음식 정보를 찾을 수 없습니다.' }),
     __param(0, (0, common_1.Query)('name')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

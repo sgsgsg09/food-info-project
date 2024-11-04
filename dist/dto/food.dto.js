@@ -19,7 +19,7 @@ __decorate([
     __metadata("design:type", String)
 ], FoodDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: '에너지(kcal)', example: 200 }),
+    (0, swagger_1.ApiProperty)({ description: '에너지(kcal)', example: 100 }),
     __metadata("design:type", Number)
 ], FoodDto.prototype, "calories", void 0);
 __decorate([

@@ -1,34 +1,17 @@
 "use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CsvParser = void 0;
-const common_1 = require("@nestjs/common");
 const fs = require("fs");
-const config_1 = require("@nestjs/config");
-const csv = require('csv-parser');
-let CsvParser = class CsvParser {
-    constructor(configService) {
-        this.configService = configService;
-        this.filePath = this.configService.get('CSV_FILE_PATH');
-        if (!this.filePath) {
-            throw new Error('CSV file path is not configured.');
+const path = require("path");
+const csv = require("csv-parser");
+class CsvParser {
+    constructor(filePath) {
+        this.filePath = filePath || path.join(__dirname, '../../FoodNutritionData.csv');
+        if (!fs.existsSync(this.filePath)) {
+            throw new Error(`CSV file not found at path: ${this.filePath}`);
         }
     }
     async parseFoodData() {
-        if (!fs.existsSync(this.filePath)) {
-            throw new Error(`File not found at path: ${this.filePath}`);
-        }
         const results = [];
         return new Promise((resolve, reject) => {
             fs.createReadStream(this.filePath)
@@ -38,7 +21,7 @@ let CsvParser = class CsvParser {
                     results.push(this.mapToFoodDto(data));
                 }
                 catch (error) {
-                    reject(new Error(`Error parsing data row: ${error.message}`));
+                    reject(new Error(`Error parsing row: ${error.message}`));
                 }
             })
                 .on('end', () => resolve(results))
@@ -46,22 +29,19 @@ let CsvParser = class CsvParser {
         });
     }
     async searchFoodByName(name) {
-        const lowerCasedName = name.trim().toLowerCase();
         const results = [];
-        if (!fs.existsSync(this.filePath)) {
-            throw new Error(`File not found at path: ${this.filePath}`);
-        }
+        const searchName = name.trim().toLowerCase();
         return new Promise((resolve, reject) => {
             fs.createReadStream(this.filePath)
                 .pipe(csv())
                 .on('data', (data) => {
                 const foodData = this.mapToFoodDto(data);
-                if (foodData.name.toLowerCase().includes(lowerCasedName)) {
+                if (foodData.name.toLowerCase().includes(searchName)) {
                     results.push(foodData);
                 }
             })
                 .on('end', () => resolve(results))
-                .on('error', (error) => reject(new Error(`Error searching for food: ${error.message}`)));
+                .on('error', (error) => reject(new Error(`Error searching CSV: ${error.message}`)));
         });
     }
     mapToFoodDto(data) {
@@ -78,11 +58,6 @@ let CsvParser = class CsvParser {
         const parsed = parseFloat(value || '0');
         return isNaN(parsed) ? 0 : parsed;
     }
-};
+}
 exports.CsvParser = CsvParser;
-exports.CsvParser = CsvParser = __decorate([
-    (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)(config_1.ConfigService)),
-    __metadata("design:paramtypes", [config_1.ConfigService])
-], CsvParser);
 //# sourceMappingURL=csv-parser.js.map
