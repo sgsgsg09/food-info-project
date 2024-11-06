@@ -14,6 +14,7 @@ const nutrition_module_1 = require("./modules/nutrition/nutrition.module");
 const user_controller_1 = require("./controllers/user.controller");
 const food_controller_1 = require("./controllers/food.controller");
 const config_1 = require("@nestjs/config");
+const ai_controller_1 = require("./controllers/ai.controller");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -25,7 +26,7 @@ exports.AppModule = AppModule = __decorate([
             ai_module_1.AiModule,
             nutrition_module_1.NutritionModule,
         ],
-        controllers: [user_controller_1.UserController, food_controller_1.FoodController],
+        controllers: [user_controller_1.UserController, food_controller_1.FoodController, ai_controller_1.AiController],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

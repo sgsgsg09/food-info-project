@@ -15,6 +15,10 @@ class UserDto {
 }
 exports.UserDto = UserDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: '성별 ("male" 또는 "female")', example: 'male', enum: ['male', 'female'] }),
+    __metadata("design:type", String)
+], UserDto.prototype, "gender", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ description: '키 (cm 단위)', example: 170 }),
     __metadata("design:type", Number)
 ], UserDto.prototype, "height", void 0);
@@ -23,19 +27,22 @@ __decorate([
     __metadata("design:type", Number)
 ], UserDto.prototype, "weight", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: '체지방률 (%)', example: 15 }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: '체지방률 (%) (선택 입력)',
+        example: 15,
+    }),
     __metadata("design:type", Number)
-], UserDto.prototype, "bodyFat", void 0);
+], UserDto.prototype, "bodyFatPercentage", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: '나이', example: 25 }),
     __metadata("design:type", Number)
 ], UserDto.prototype, "age", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: '활동 수준 (1: 아주 낮음 ~ 5: 매우 높음)',
-        example: 3,
-        minimum: 1,
-        maximum: 5,
+        description: '활동 수준 (1.2: 아주 낮음 ~ 1.9: 매우 높음)',
+        example: 1.55,
+        minimum: 1.2,
+        maximum: 1.9,
     }),
     __metadata("design:type", Number)
 ], UserDto.prototype, "activityLevel", void 0);

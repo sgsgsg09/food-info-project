@@ -1,7 +1,8 @@
 export declare class UserDto {
+    gender: 'male' | 'female';
     height: number;
     weight: number;
-    bodyFat: number;
+    bodyFatPercentage?: number;
     age: number;
     activityLevel: number;
 }

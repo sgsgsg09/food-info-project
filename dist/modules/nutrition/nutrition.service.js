@@ -9,28 +9,64 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NutritionService = void 0;
 const common_1 = require("@nestjs/common");
 let NutritionService = class NutritionService {
-    calculateUserDailyNeeds(user) {
-        const baseCalories = 10 * user.weight + 6.25 * user.height - 5 * user.age;
-        const activityMultiplier = this.getActivityMultiplier(user.activityLevel);
-        const calories = baseCalories * activityMultiplier;
-        const protein = user.weight * 1.2;
-        const fat = calories * 0.25 / 9;
-        const carbs = (calories - protein * 4 - fat * 9) / 4;
-        const fiber = 30;
-        return { calories, protein, fat, carbs, fiber };
+    calculateMealPortion(userNeeds) {
+        const mealPortion = {
+            calories: userNeeds.calories / 3,
+            protein: userNeeds.protein / 3,
+            fat: userNeeds.fat / 3,
+            carbs: userNeeds.carbs / 3,
+            fiber: userNeeds.fiber / 3,
+        };
+        return mealPortion;
     }
-    compareWithUserNeeds(food, userNeeds) {
+    analyzeFoodForUser(food, userNeeds) {
+        const mealPortion = this.calculateMealPortion(userNeeds);
         return {
-            caloriesDifference: food.calories - userNeeds.calories,
-            proteinDifference: food.protein - userNeeds.protein,
-            fatDifference: food.fat - userNeeds.fat,
-            carbsDifference: food.carbs - userNeeds.carbs,
-            fiberDifference: food.fiber - userNeeds.fiber,
+            ...food,
+            isSuitable: food.calories <= mealPortion.calories,
         };
     }
-    getActivityMultiplier(level) {
-        const multipliers = [1.2, 1.375, 1.55, 1.725, 1.9];
-        return multipliers[level - 1] || 1.2;
+    calculateUserDailyNeeds(user) {
+        let bmr;
+        if (user.bodyFatPercentage !== undefined) {
+            const leanBodyMass = user.weight * (1 - user.bodyFatPercentage / 100);
+            bmr = 370 + (21.6 * leanBodyMass);
+        }
+        else {
+            bmr = user.gender === 'male'
+                ? 88.362 + (13.397 * user.weight) + (4.799 * user.height) - (5.677 * user.age)
+                : 447.593 + (9.247 * user.weight) + (3.098 * user.height) - (4.330 * user.age);
+        }
+        const tdee = bmr * (user.activityLevel || 1.2);
+        const proteinCalories = tdee * 0.15;
+        const fatCalories = tdee * 0.25;
+        const carbCalories = tdee * 0.6;
+        return {
+            calories: tdee,
+            protein: proteinCalories / 4,
+            fat: fatCalories / 9,
+            carbs: carbCalories / 4,
+            fiber: user.age > 50
+                ? (user.gender === 'male' ? 30 : 21)
+                : (user.gender === 'male' ? 38 : 25),
+        };
+    }
+    compareWithUserNeeds(food, userNeeds) {
+        const proteinDiff = food.protein - userNeeds.protein;
+        const fatDiff = food.fat - userNeeds.fat;
+        const carbsDiff = food.carbs - userNeeds.carbs;
+        const fiberDiff = food.fiber - userNeeds.fiber;
+        return {
+            foodName: food.name,
+            isSuitable: proteinDiff >= 0 && fatDiff >= 0 && carbsDiff >= 0 && fiberDiff >= 0,
+            details: {
+                calories: food.calories,
+                protein: { amount: food.protein, diff: proteinDiff },
+                fat: { amount: food.fat, diff: fatDiff },
+                carbs: { amount: food.carbs, diff: carbsDiff },
+                fiber: { amount: food.fiber, diff: fiberDiff },
+            },
+        };
     }
 };
 exports.NutritionService = NutritionService;

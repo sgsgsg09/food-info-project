@@ -12,36 +12,32 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserController = void 0;
+exports.NutritionController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const nutrition_service_1 = require("../modules/nutrition/nutrition.service");
-const user_dto_1 = require("../dto/user.dto");
 const user_daily_needs_dto_1 = require("../dto/user-daily-needs.dto");
-let UserController = class UserController {
+let NutritionController = class NutritionController {
     constructor(nutritionService) {
         this.nutritionService = nutritionService;
     }
-    async calculateUserNeeds(userDto) {
-        if (!userDto.gender || !userDto.height || !userDto.weight || !userDto.age || !userDto.activityLevel) {
-            throw new common_1.BadRequestException('필수 사용자 정보가 누락되었습니다.');
-        }
-        return this.nutritionService.calculateUserDailyNeeds(userDto);
+    calculateMealPortion(userNeeds) {
+        return this.nutritionService.calculateMealPortion(userNeeds);
     }
 };
-exports.UserController = UserController;
+exports.NutritionController = NutritionController;
 __decorate([
-    (0, common_1.Post)('calculate-needs'),
-    (0, swagger_1.ApiOperation)({ summary: '사용자의 일일 필요 영양소 계산' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: '사용자의 일일 필요 영양소 반환', type: user_daily_needs_dto_1.UserDailyNeedsDto }),
+    (0, common_1.Post)('meal-portion'),
+    (0, swagger_1.ApiOperation)({ summary: '사용자의 일일 필요 영양 성분에 따른 한 끼 섭취량 계산' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: '한 끼 섭취량 반환' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_dto_1.UserDto]),
-    __metadata("design:returntype", Promise)
-], UserController.prototype, "calculateUserNeeds", null);
-exports.UserController = UserController = __decorate([
-    (0, swagger_1.ApiTags)('User'),
-    (0, common_1.Controller)('user'),
+    __metadata("design:paramtypes", [user_daily_needs_dto_1.UserDailyNeedsDto]),
+    __metadata("design:returntype", void 0)
+], NutritionController.prototype, "calculateMealPortion", null);
+exports.NutritionController = NutritionController = __decorate([
+    (0, swagger_1.ApiTags)('Nutrition'),
+    (0, common_1.Controller)('nutrition'),
     __metadata("design:paramtypes", [nutrition_service_1.NutritionService])
-], UserController);
-//# sourceMappingURL=user.controller.js.map
+], NutritionController);
+//# sourceMappingURL=nutrition.controller.js.map

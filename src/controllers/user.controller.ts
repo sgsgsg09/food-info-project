@@ -1,39 +1,25 @@
-import { Controller, Post, Body, NotFoundException } from '@nestjs/common';
+// src/controllers/user.controller.ts
+import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { NutritionService } from '../modules/nutrition/nutrition.service';
-import { FoodService } from '../modules/food/food.service';
 import { UserDto } from '../dto/user.dto';
+import { UserDailyNeedsDto } from '../dto/user-daily-needs.dto';
 
+@ApiTags('User')
 @Controller('user')
 export class UserController {
-  constructor(
-    private readonly foodService: FoodService,
-    private readonly nutritionService: NutritionService,
-  ) {}
+  constructor(private readonly nutritionService: NutritionService) {}
 
-  @Post('analyze')
-  async analyzeFood(@Body() body: { foodName: string; user?: UserDto }) {
-    const { foodName, user } = body;
-
-    // 음식 정보 조회 (배열 형태로 여러 결과가 반환될 수 있음)
-    const foodInfo = await this.foodService.getFoodInfo(foodName);
-    if (!foodInfo || foodInfo.length === 0) {
-      throw new NotFoundException('해당 음식 정보를 찾을 수 없습니다.');
+  @Post('calculate-needs')
+  @ApiOperation({ summary: '사용자의 일일 필요 영양소 계산' })
+  @ApiResponse({ status: 200, description: '사용자의 일일 필요 영양소 반환', type: UserDailyNeedsDto })
+  async calculateUserNeeds(@Body() userDto: UserDto): Promise<UserDailyNeedsDto> {
+    // 유효성 검사
+    if (!userDto.gender || !userDto.height || !userDto.weight || !userDto.age || !userDto.activityLevel) {
+      throw new BadRequestException('필수 사용자 정보가 누락되었습니다.');
     }
 
-    // 신체 정보가 없으면 음식 정보만 반환
-    if (!user) {
-      return { foodInfo };
-    }
-
-    // 신체 정보가 있을 경우, 각 음식에 대해 맞춤형 영양 분석 수행
-    const userNeeds = this.nutritionService.calculateUserDailyNeeds(user);
-    const nutritionComparison = foodInfo.map((food) =>
-      this.nutritionService.compareWithUserNeeds(food, userNeeds),
-    );
-
-    return {
-      foodInfo,
-      nutritionComparison,
-    };
+    // NutritionService에서 사용자 일일 필요 영양 성분을 계산
+    return this.nutritionService.calculateUserDailyNeeds(userDto);
   }
 }

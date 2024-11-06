@@ -16,13 +16,14 @@ exports.FoodController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const food_service_1 = require("../modules/food/food.service");
+const nutrition_service_1 = require("../modules/nutrition/nutrition.service");
 const food_dto_1 = require("../dto/food.dto");
 let FoodController = class FoodController {
-    constructor(foodService) {
+    constructor(foodService, nutritionService) {
         this.foodService = foodService;
+        this.nutritionService = nutritionService;
     }
     async getFoodInfo(name) {
-        console.log(`Received search name: ${name}`);
         if (!name || name.trim() === '') {
             throw new common_1.NotFoundException('검색어를 입력해 주세요.');
         }
@@ -38,6 +39,7 @@ __decorate([
     (0, common_1.Get)('info'),
     (0, swagger_1.ApiOperation)({ summary: '음식 이름으로 음식 정보 조회' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: '음식 정보 반환', type: food_dto_1.FoodDto, isArray: true }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: '음식 정보를 찾을 수 없습니다.' }),
     __param(0, (0, common_1.Query)('name')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -46,6 +48,7 @@ __decorate([
 exports.FoodController = FoodController = __decorate([
     (0, swagger_1.ApiTags)('Food'),
     (0, common_1.Controller)('food'),
-    __metadata("design:paramtypes", [food_service_1.FoodService])
+    __metadata("design:paramtypes", [food_service_1.FoodService,
+        nutrition_service_1.NutritionService])
 ], FoodController);
 //# sourceMappingURL=food.controller.js.map

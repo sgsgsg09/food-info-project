@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as csv from 'csv-parser';
 import { FoodDto } from '../dto/food.dto';
 
+
 export class CsvParser {
   private readonly filePath: string;
 
@@ -23,8 +24,8 @@ export class CsvParser {
     const results: FoodDto[] = [];
 
     return new Promise((resolve, reject) => {
-      fs.createReadStream(this.filePath)
-        .pipe(csv())
+      fs.createReadStream(this.filePath, { encoding: 'utf-8' })
+      .pipe(csv())
         .on('data', (data) => {
           try {
             results.push(this.mapToFoodDto(data));
@@ -40,7 +41,8 @@ export class CsvParser {
   // 특정 음식 이름을 검색하여 해당 데이터를 반환
   async searchFoodByName(name: string): Promise<FoodDto[]> {
     const results: FoodDto[] = [];
-    const searchName = name.trim().toLowerCase();
+    const searchName = decodeURIComponent(name.trim().toLowerCase());
+    // 인코딩된 문자열이 들어오면.
 
     return new Promise((resolve, reject) => {
       fs.createReadStream(this.filePath)

@@ -5,6 +5,8 @@ import { NutritionModule } from './modules/nutrition/nutrition.module';
 import { UserController } from './controllers/user.controller';
 import { FoodController } from './controllers/food.controller';
 import { ConfigModule } from '@nestjs/config';
+import { AiController } from './controllers/ai.controller';
+
 
 @Module({
   imports: [
@@ -13,6 +15,6 @@ import { ConfigModule } from '@nestjs/config';
     AiModule,
     NutritionModule,
   ],
-  controllers: [UserController, FoodController],
+  controllers: [UserController, FoodController, AiController],
 })
 export class AppModule {}

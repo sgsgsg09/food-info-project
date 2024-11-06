@@ -1,3 +1,4 @@
+// src/modules/food/food.service.ts
 import { Injectable } from '@nestjs/common';
 import { FoodDto } from '../../dto/food.dto';
 import { FoodRepository } from './food.repository';
@@ -10,10 +11,8 @@ export class FoodService {
     return await this.foodRepository.findAll();
   }
 
-// FoodService
-async getFoodInfo(name: string): Promise<FoodDto[]> {
-  const foodInfo = await this.foodRepository.findByName(name);
-  console.log(`FoodService found food info: ${JSON.stringify(foodInfo)}`);
-  return foodInfo;
-}
+  async getFoodInfo(name: string): Promise<FoodDto[]> {
+    const processedName = name.trim().toLowerCase();
+    return await this.foodRepository.findByName(processedName);
+  }
 }

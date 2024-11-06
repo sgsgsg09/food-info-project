@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사용자 정보 및 음식 정보 전송</title>
+</head>
+<body>
+  <h2>사용자 정보 입력</h2>
+  <form id="userForm">
+    <label for="gender">성별:</label>
+    <select id="gender" name="gender" required>
+      <option value="male">남성</option>
+      <option value="female">여성</option>
+    </select>
+
+    <label for="height">키 (cm):</label>
+    <input type="number" id="height" name="height" required>
+
+    <label for="weight">몸무게 (kg):</label>
+    <input type="number" id="weight" name="weight" required>
+
+    <label for="bodyFatPercentage">체지방률 (%):</label>
+    <input type="number" id="bodyFatPercentage" name="bodyFatPercentage">
+
+    <label for="age">나이:</label>
+    <input type="number" id="age" name="age" required>
+
+    <label for="activityLevel">활동 수준 (1.2 ~ 1.9):</label>
+    <input type="number" id="activityLevel" name="activityLevel" step="0.1" min="1.2" max="1.9" required>
+
+    <button type="submit">사용자 정보 전송</button>
+  </form>
+
+  <h2>음식 이름 입력</h2>
+  <form id="foodNameForm">
+    <label for="foodName">음식 이름:</label>
+    <input type="text" id="foodName" name="foodName" required>
+    <button type="submit">음식 이름 전송</button>
+  </form>
+
+  <h2>음식 사진 업로드</h2>
+  <form id="foodImageForm" enctype="multipart/form-data">
+    <label for="foodImage">음식 사진:</label>
+    <input type="file" id="foodImage" name="foodImage" accept="image/*" required>
+    <button type="submit">음식 사진 전송</button>
+  </form>
+
+  <h3>결과</h3>
+  <pre id="result"></pre>
+
+  <script>
+    // 사용자 정보 전송
+    document.getElementById('userForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const userData = {
+        gender: document.getElementById('gender').value,
+        height: parseFloat(document.getElementById('height').value),
+        weight: parseFloat(document.getElementById('weight').value),
+        bodyFatPercentage: parseFloat(document.getElementById('bodyFatPercentage').value) || undefined,
+        age: parseInt(document.getElementById('age').value),
+        activityLevel: parseFloat(document.getElementById('activityLevel').value)
+      };
+    // 음식 이름 전송 부분
+      try {
+        const response = await fetch('http://localhost:3000/api/user/calculate-needs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(userData)
+        });
+        const result = await response.json();
+        document.getElementById('result').textContent = JSON.stringify(result, null, 2);
+      } catch (error) {
+        document.getElementById('result').textContent = `사용자 정보 전송 실패: ${error.message}`;
+      }
+    });
+
+    // 음식 이름 전송
+    document.getElementById('foodNameForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const foodName = document.getElementById('foodName').value;
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/food/info?name=${encodeURIComponent(foodName)}`);
+        const result = await response.json();
+        document.getElementById('result').textContent = JSON.stringify(result, null, 2);
+      } catch (error) {
+        document.getElementById('result').textContent = `음식 이름 전송 실패: ${error.message}`;
+      }
+    });
+
+    // 음식 사진 전송
+    document.getElementById('foodImageForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const formData = new FormData();
+      formData.append('file', document.getElementById('foodImage').files[0]);
+
+      try {
+        const response = await fetch('http://localhost:3000/api/ai/analyze-image', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await response.json();
+        document.getElementById('result').textContent = JSON.stringify(result, null, 2);
+      } catch (error) {
+        document.getElementById('result').textContent = `음식 사진 전송 실패: ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>

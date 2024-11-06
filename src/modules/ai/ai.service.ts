@@ -1,14 +1,15 @@
+// src/modules/ai/ai.service.ts
 import { Injectable } from '@nestjs/common';
 import OpenAI from 'openai';
-import { ConfigService } from '@nestjs/config';
+import { OpenAiConfig } from '../../config/openai.config';
 
 @Injectable()
 export class AiService {
   private openai: OpenAI;
 
-  constructor(private configService: ConfigService) {
+  constructor(private openAiConfig: OpenAiConfig) {
     this.openai = new OpenAI({
-      apiKey: this.configService.get<string>('OPENAI_API_KEY'),
+      apiKey: this.openAiConfig.getApiKey(), // OpenAiConfig에서 API 키를 가져옴
     });
   }
 
