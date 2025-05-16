@@ -67,6 +67,8 @@ export class CsvParser {
       fat: this.parseNumber(data['지방(g)'] || data['fat']),
       carbs: this.parseNumber(data['탄수화물(g)'] || data['carbs']),
       fiber: this.parseNumber(data['식이섬유(g)'] || data['fiber']),
+      weight: this.parseNumber(data['식품중량'] || data['weight']),
+      
     };
   }
 

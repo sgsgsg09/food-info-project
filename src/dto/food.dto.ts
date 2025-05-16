@@ -18,4 +18,7 @@ export class FoodDto {
 
   @ApiProperty({ description: '식이섬유(g)', example: 3 })
   fiber: number;
+
+  @ApiProperty({ description: '식품중량', example: 400 })
+  weight?: number;  // 입력된 중량 (선택 입력)
 }
